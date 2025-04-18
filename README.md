@@ -1,1 +1,1 @@
-Creating a Maze solver.
+cd C:\Users\<YourWindowsUsername>\Maze_solver
