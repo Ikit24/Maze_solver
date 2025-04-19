@@ -1,29 +1,27 @@
-from tkinter import Tk, BOTH, Canvas
+from graphics import Window
+from cell import Cell
 
-class Window():
-    def __init__(self, width, height):
-        self.__root = Tk()
-        self.__root.title("Mazer")
-        self.__canvas = Canvas(self.__root, bg="white", width=width, height=height)
-        self.__canvas.pack(fill=BOTH, expand=1)
-        self.__window_running = False
-        self.__root.protocol("WM_DELETE_WINDOW", self.close)
-
-    def redraw(self):
-        self.__root.update_idletasks()
-        self.__root.update()
-
-    def wait_for_close(self):
-        self.__window_running = True
-        while self.__window_running:
-            self.redraw()
-
-    def close(self):
-         self.__window_running = False
 
 def main():
     win = Window(800, 600)
+
+    c = Cell(win)
+    c.has_left_wall = False
+    c.draw(50, 50, 100, 100)
+
+    c = Cell(win)
+    c.has_right_wall = False
+    c.draw(125, 125, 200, 200)
+
+    c = Cell(win)
+    c.has_bottom_wall = False
+    c.draw(225, 225, 250, 250)
+
+    c = Cell(win)
+    c.has_top_wall = False
+    c.draw(300, 300, 500, 500)
+
     win.wait_for_close()
 
-if __name__ == "__main__":
-    main()
+
+main()
