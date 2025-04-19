@@ -2,3 +2,4 @@ venv
 .code
 env
 myenv
+__pycache__
