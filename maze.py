@@ -22,6 +22,7 @@ class Maze:
         self.cell_size_x = cell_size_x
         self.cell_size_y = cell_size_y
         self._win = win
+        self.maze_solve = False
 
         self._create_cells()
         self._break_entrance_and_exit()
@@ -114,3 +115,46 @@ class Maze:
         for i in range(self._num_cols):
             for j in range(self._num_rows):
                 self._cells[i][j].visited = False
+    
+    def _solve_r(self, i, j):
+        self._animate()
+        self._cells[i][j].visited = True
+        
+        if i == self._num_rows - 1 and j == self._num_cols - 1:
+            return True
+        # Left
+        if i > 0 and not self._cells[i-1][j].visited and not self._cells[i][j].has_left_wall:
+            self._cells[i][j].draw_move(self._cells[i-1][j])
+            if self._solve_r(i - 1, j):
+                return True
+            else:
+                self._cells[i][j].draw_move(self._cells[i-1][j], True)
+        # Right    
+        if i < self._num_cols - 1 and not self._cells[i+1][j].visited and not self._cells[i][j].has_right_wall:
+            self._cells[i][j].draw_move(self._cells[i+1][j])
+            if self._solve_r(i + 1, j):
+                return True
+            else:
+                self._cells[i][j].draw_move(self._cells[i+1][j], True)
+        # Up
+        if j > 0 and not self._cells[i][j-1].visited and not self._cells[i][j].has_top_wall:
+            self._cells[i][j].draw_move(self._cells[i][j-1])
+            if self._solve_r(i, j - 1):
+                return True
+            else:
+                self._cells[i][j].draw_move(self._cells[i][j-1], True)
+        # Down
+        if j < self._num_rows - 1 and not self._cells[i][j+1].visited and not self._cells[i][j].has_bottom_wall:
+            self._cells[i][j].draw_move(self._cells[i][j+1])
+            if self._solve_r(i, j + 1):
+                return True
+            else:
+                self._cells[i][j].draw_move(self._cells[i][j+1], True)
+        
+        return False
+        
+    def solve(self):
+        self._reset_cells_visited()
+        result = self._solve_r(0, 0)
+        self.maze_solve = result
+        return result
