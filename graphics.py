@@ -1,4 +1,4 @@
-from tkinter import Tk, BOTH, Canvas
+from tkinter import Tk, BOTH, Canvas, Entry
 
 class Window:
     def __init__(self, width, height):
@@ -19,7 +19,7 @@ class Window:
             self.redraw()
 
     def draw_line(self, line, fill_color="black"):
-        self.__canvas.create_line(line.p1.x, line.p1.y, line.p2.x, line.p2.y, fill=fill_color, width=2)
+        self.__canvas.create_line(line.p1.x, line.p1.y, line.p2.x, line.p2.y, fill=fill_color, width=line.width)
 
     def close(self):
          self.__window_running = False
@@ -30,10 +30,13 @@ class Point:
         self.y = y
 
 class Line:
-    def __init__(self, p1, p2):
+    def __init__(self, p1, p2, width=1):
         self.p1 = p1
         self.p2 = p2
+        self.width = width 
 
     def draw(self, window, fill_color="black"):
         window.draw_line(self, fill_color)
-        
+
+    def set_Width(self, width):
+        self.width = width     
