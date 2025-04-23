@@ -1,1 +1,1 @@
-cd C:\Users\<YourWindowsUsername>\Maze_solver
+My first Maze solver, using Tkinter.
