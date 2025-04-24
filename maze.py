@@ -1,4 +1,5 @@
 from cell import Cell
+from collections import deque
 import random
 import time
 
@@ -158,3 +159,31 @@ class Maze:
         result = self._solve_r(0, 0)
         self.maze_solve = result
         return result
+    
+    def _solve_bfs(self, i, j):
+        if i == self._num_rows - 1 and j == self._num_cols - 1:
+            return True
+
+        queue = deque([(i, j)])
+        self._cells[i][j].visited = True
+
+        while queue:
+            current_i, current_j = queue.popleft()
+            self._animate()
+
+            if current_i == self._num_rows - 1 and current_j == self._num_cols - 1:
+                return True
+            
+            # Left
+            if current_i > 0 and not self._cells[current_i - 1][current_j].visited and not self._cells[current_i][current_j].has_left_wall:
+                self._cells[current_i][current_j].draw_move(self._cells[current_i - 1][current_j])
+                self._cells[current_i - 1][current_j].visited = True
+                queue.append((current_i - 1, current_j))
+        
+        
+        
+        # No path found
+        return False
+
+
+        
