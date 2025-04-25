@@ -156,7 +156,7 @@ class Maze:
         
     def solve(self):
         self._reset_cells_visited()
-        result = self._solve_r(0, 0)
+        result = self._solve_bfs(0, 0)
         self.maze_solve = result
         return result
     
@@ -179,11 +179,29 @@ class Maze:
                 self._cells[current_i][current_j].draw_move(self._cells[current_i - 1][current_j])
                 self._cells[current_i - 1][current_j].visited = True
                 queue.append((current_i - 1, current_j))
-        
-        
-        
+            # Right
+            if current_i < self._num_cols - 1 and not self._cells[current_i + 1][current_j].visited and not self._cells[current_i][current_j].has_right_wall:
+                self._cells[current_i][current_j].draw_move(self._cells[current_i + 1][current_j])
+                self._cells[current_i + 1][current_j]. visited = True
+                queue.append((current_i + 1, current_j))
+            # Up
+            if current_j > 0 and not self._cells[current_i][current_j - 1].visited and not self._cells[current_i][current_j].has_top_wall:
+                self._cells[current_i][current_j].draw_move(self._cells[current_i][current_j - 1])
+                self._cells[current_i][current_j - 1].visited = True
+                queue.append((current_i, current_j - 1))
+            # Down
+            if current_j < self._num_rows - 1 and not self._cells[current_i][current_j + 1].visited and not self._cells[current_i][current_j].has_bottom_wall:
+                self._cells[current_i][current_j].draw_move(self._cells[current_i][current_j + 1])
+                self._cells[current_i][current_j + 1].visited = True
+                queue.append((current_i, current_j + 1))     
         # No path found
         return False
+    
+    def _solve_A_star(self, i, j):
+        # Manhattan distance
+        # h(n) = |current_x - goal_x| + |current_y - goal_y|
+        # manhattan_distance = abs(current_x - goal_x) + abs(current_y - goal_y)
+        pass
 
 
         
