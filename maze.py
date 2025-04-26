@@ -2,6 +2,7 @@ from cell import Cell
 from collections import deque
 import random
 import time
+import heapq
 
 class Maze:
     def __init__(
@@ -156,7 +157,7 @@ class Maze:
         
     def solve(self):
         self._reset_cells_visited()
-        result = self._solve_bfs(0, 0)
+        result = self._solve_A_star(0, 0)
         self.maze_solve = result
         return result
     
@@ -197,11 +198,129 @@ class Maze:
         # No path found
         return False
     
-    def _solve_A_star(self, i, j):
-        # Manhattan distance
-        # h(n) = |current_x - goal_x| + |current_y - goal_y|
-        # manhattan_distance = abs(current_x - goal_x) + abs(current_y - goal_y)
-        pass
-
-
+    def _calculate_heuristic(self, current, goal):
+        current_i, current_j = current
+        goal_i, goal_j = goal
         
+        # Manhattan distance
+        return abs(current_i - goal_i) + abs(current_j - goal_j)
+
+    
+    def _solve_A_star(self, start_i, start_j):
+        goal_i, goal_j = self._num_rows - 1, self._num_cols - 1
+
+        if start_i == goal_i and start_j == goal_j:
+            return True
+        
+        # Tracks teps from start
+        g_scores = {}
+        g_scores[(start_i, start_j)] = 0
+
+        # Calculate f scores (g + h)
+        f_scores = {}
+        f_scores[(start_i, start_j)] = self._calculate_heuristic((start_i, start_j), (goal_i, goal_j))
+
+        # Priority queue
+        open_set = []
+        heapq.heappush(open_set, (f_scores[(start_i, start_j)], (start_i, start_j)))
+
+        # Track visited cells for reconstruction
+        visited = set()
+        parents = {}
+
+        while open_set:
+            _, (current_i, current_j) = heapq.heappop(open_set)
+            self._animate()
+
+            if current_i == goal_i and current_j == goal_j:
+                return True
+            visited.add((current_i, current_j))
+            self._cells[current_i][current_j].visited = True
+            # Left
+            if (current_i > 0 and not self._cells[current_i][current_j].has_left_wall):
+                neighbor = (current_i - 1, current_j)
+                
+                # Calculate tentative g_score (one step further)
+                tentative_g_score = g_scores[(current_i, current_j)] + 1
+                
+                # If we found a better path to this neighbor
+                if neighbor not in g_scores or tentative_g_score < g_scores[neighbor]:
+                    # Update parent for path reconstruction
+                    parents[neighbor] = (current_i, current_j)
+                    
+                    # Update scores
+                    g_scores[neighbor] = tentative_g_score
+                    f_scores[neighbor] = g_scores[neighbor] + self._calculate_heuristic(neighbor, (goal_i, goal_j))
+                    
+                    # Add to queue if not already visited
+                    if neighbor not in visited:
+                        heapq.heappush(open_set, (f_scores[neighbor], neighbor))
+                        self._cells[current_i][current_j].draw_move(self._cells[neighbor[0]][neighbor[1]])
+                        self._cells[neighbor[0]][neighbor[1]].visited = True
+            
+            # Right
+            if (current_i < self._num_rows - 1 and not self._cells[current_i][current_j].has_right_wall):
+                neighbor = (current_i + 1, current_j)
+                
+                # Calculate tentative g_score (one step further)
+                tentative_g_score = g_scores[(current_i, current_j)] + 1
+                
+                # If we found a better path to this neighbor
+                if neighbor not in g_scores or tentative_g_score < g_scores[neighbor]:
+                    # Update parent for path reconstruction
+                    parents[neighbor] = (current_i, current_j)
+                    
+                    # Update scores
+                    g_scores[neighbor] = tentative_g_score
+                    f_scores[neighbor] = g_scores[neighbor] + self._calculate_heuristic(neighbor, (goal_i, goal_j))
+                    
+                    # Add to queue if not already visited
+                    if neighbor not in visited:
+                        heapq.heappush(open_set, (f_scores[neighbor], neighbor))
+                        self._cells[current_i][current_j].draw_move(self._cells[neighbor[0]][neighbor[1]])
+                        self._cells[neighbor[0]][neighbor[1]].visited = True
+
+            # Up
+            if (current_j > 0 and not self._cells[current_i][current_j].has_top_wall):
+                neighbor = (current_i, current_j - 1)
+                
+                # Calculate tentative g_score (one step further)
+                tentative_g_score = g_scores[(current_i, current_j)] + 1
+                
+                # If we found a better path to this neighbor
+                if neighbor not in g_scores or tentative_g_score < g_scores[neighbor]:
+                    # Update parent for path reconstruction
+                    parents[neighbor] = (current_i, current_j)
+                    
+                    # Update scores
+                    g_scores[neighbor] = tentative_g_score
+                    f_scores[neighbor] = g_scores[neighbor] + self._calculate_heuristic(neighbor, (goal_i, goal_j))
+                    
+                    # Add to queue if not already visited
+                    if neighbor not in visited:
+                        heapq.heappush(open_set, (f_scores[neighbor], neighbor))
+                        self._cells[current_i][current_j].draw_move(self._cells[neighbor[0]][neighbor[1]])
+                        self._cells[neighbor[0]][neighbor[1]].visited = True
+
+            # Down
+            if (current_j < self._num_rows - 1 and not self._cells[current_i][current_j].has_bottom_wall):
+                neighbor = (current_i, current_j + 1)
+                
+                # Calculate tentative g_score (one step further)
+                tentative_g_score = g_scores[(current_i, current_j)] + 1
+                
+                # If we found a better path to this neighbor
+                if neighbor not in g_scores or tentative_g_score < g_scores[neighbor]:
+                    # Update parent for path reconstruction
+                    parents[neighbor] = (current_i, current_j)
+                    
+                    # Update scores
+                    g_scores[neighbor] = tentative_g_score
+                    f_scores[neighbor] = g_scores[neighbor] + self._calculate_heuristic(neighbor, (goal_i, goal_j))
+                    
+                    # Add to queue if not already visited
+                    if neighbor not in visited:
+                        heapq.heappush(open_set, (f_scores[neighbor], neighbor))
+                        self._cells[current_i][current_j].draw_move(self._cells[neighbor[0]][neighbor[1]])
+                        self._cells[neighbor[0]][neighbor[1]].visited = True
+        return False
