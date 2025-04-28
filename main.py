@@ -1,10 +1,11 @@
 from graphics import Window
 from maze import Maze
+from timer import Timer
 import sys
-import time
 
 
 def main():
+    t =  Timer()
     row_inpt = int(input("Input the number of rows "))
     col_inpt = int(input("Input the number of colums "))
     solution_type = input("Input prefererred solution type 'BFS', 'DFS' or 'A_star': ").lower()
@@ -21,7 +22,8 @@ def main():
 
     maze = Maze(margin, margin, num_rows, num_cols, cell_size_x, cell_size_y, win, 10)
     print("maze created")
-    tic = time.perf_counter()
+    
+    t.start()
     if solution_type == "bfs":
         is_solvable = maze._solve_bfs(0, 0)
     elif solution_type == "dfs":
@@ -32,11 +34,8 @@ def main():
         print("maze can not be solved!")
     else:
         print("maze solved!")
-    toc = time.perf_counter()
-
-    print(f"Maze solved in {toc - tic:0.2f} seconds")
+    t.stop()
 
     win.wait_for_close()
-
 
 main()
