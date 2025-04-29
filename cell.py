@@ -1,4 +1,5 @@
 from graphics import Line, Point
+import time
 
 class Cell:
     def __init__(self, win=None):
@@ -57,6 +58,9 @@ class Cell:
         fill_color = "green"
         if undo:
             fill_color = "red"
+            time.sleep(0.01)
+        else:
+            time.sleep(0.08)
 
         line = Line(Point(x_center, y_center), Point(x_center2, y_center2), width=3)
         self._win.draw_line(line, fill_color)
