@@ -2,7 +2,27 @@ from graphics import Window
 from maze import Maze
 from timer import Timer
 import sys
+import tkinter as tk
+from tkinter import Frame, messagebox
 
+root = tk.Tk()
+root.title("Maze Solver")
+
+top_frame = Frame(root, width=400, height=400, bg="grey")
+top_frame.pack(side="top", fill="x", padx=10, pady=5, expand=True)
+
+bottom_frame = Frame(root, width=1200, height=800,bg="white")
+bottom_frame.pack(side="bottom", fill="both", padx=10, pady=5, expand=True)
+
+row_entry = tk.Entry(top_frame, text="Enter nr of rows! ")
+start_btn = tk.Button(top_frame, text="Start", command=start_maze)
+start.pack()
+
+def start_maze():
+    try:
+        rows = int(row_entry.get())
+    except ValueError:
+        messagebox.showerror("Invalide input!", "Please enter a valid integer for rows.")
 
 def main():
     t =  Timer()
