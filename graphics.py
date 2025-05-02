@@ -39,4 +39,4 @@ class Line:
         window.draw_line(self, fill_color)
 
     def set_Width(self, width):
-        self.width = width     
+        self.width = width

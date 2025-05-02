@@ -11,7 +11,7 @@ root.title("Maze Solver")
 top_frame = Frame(root, width=800, height=800, bg="grey")
 top_frame.pack(side="top", fill="x", padx=10, pady=5, expand=True)
 
-bottom_frame = Frame(root, width=1200, height=800,bg="white")
+bottom_frame = Frame(root, width=800, height=800,bg="white")
 bottom_frame.pack(side="bottom", fill="both", padx=10, pady=5, expand=True)
 maze_canvas = tk.Canvas(bottom_frame, width=1200, height=800, bg="white")
 maze_canvas.pack(fill="both", expand=True)
@@ -26,7 +26,8 @@ col_entry = tk.Entry(top_frame)
 col_entry.pack()
 
 solution_var = tk.StringVar()
-solutions = ttk.Combobox(top_frame, width = 15, textvariable=solution_var)
+solutions = ttk.Combobox(top_frame, width = 20, textvariable=solution_var)
+solution_var.set("Choose solution method")
 solutions.pack()
 solutions['values'] = ('BFS', 'DFS', 'A_star')
 
@@ -70,7 +71,6 @@ def start_maze():
         print("maze solved!")
     sys.setrecursionlimit(10000)
     win.wait_for_close()
-    root.destroy()
     sys.exit()
 start_btn = tk.Button(top_frame, command=start_maze, text="Start!")
 
