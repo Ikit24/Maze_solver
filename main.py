@@ -7,14 +7,16 @@ from tkinter import Frame, messagebox, Label, ttk
 
 root = tk.Tk()
 root.title("Maze Solver")
+timer = Timer(root)
 
-top_frame = Frame(root, width=800, height=800, bg="grey")
+top_frame = Frame(root, width=1200, height=1000, bg="grey")
 top_frame.pack(side="top", fill="x", padx=10, pady=5, expand=True)
 
-bottom_frame = Frame(root, width=800, height=800,bg="white")
-bottom_frame.pack(side="bottom", fill="both", padx=10, pady=5, expand=True)
-maze_canvas = tk.Canvas(bottom_frame, width=1200, height=800, bg="white")
-maze_canvas.pack(fill="both", expand=True)
+# bottom_frame = Frame(root, width=800, height=800,bg="white")
+# bottom_frame.pack(side="bottom", fill="both", padx=10, pady=5, expand=True)
+# maze_canvas = tk.Canvas(bottom_frame, width=1200, height=800, bg="white")
+# maze_canvas.pack(fill="both", expand=True)
+
 
 row_label = tk.Label(top_frame, text="Enter nr of rows: ")
 row_label.pack()
@@ -30,6 +32,15 @@ solutions = ttk.Combobox(top_frame, width = 20, textvariable=solution_var)
 solution_var.set("Choose solution method")
 solutions.pack()
 solutions['values'] = ('BFS', 'DFS', 'A_star')
+
+
+def on_closing():
+    """Handle window closing event"""
+    if messagebox.askokcancel("Quit", "Do you want to quit?"):
+        root.destroy()  # This will close the main Tkinter window
+        sys.exit()  # This should terminate the entire application
+
+# Add this to set up the close handler
 
 
 def start_maze():
@@ -50,7 +61,6 @@ def start_maze():
     selected = solution_var.get()
     if rows is None or cols is None:
         return
-    root.withdraw()
     margin = 50
     screen_x = 1200
     screen_y = 1000
@@ -59,6 +69,7 @@ def start_maze():
     win = Window(screen_x, screen_y)
     maze = Maze(margin, margin, rows, cols, cell_size_x, cell_size_y, win=win)
     selected = solution_var.get()
+    timer.start()
     if selected == "BFS":
         is_solvable = maze._solve_bfs(0, 0)
     elif selected == "DFS":
@@ -69,9 +80,10 @@ def start_maze():
         print("maze can not be solved!")
     else:
         print("maze solved!")
+    timer.stop_timer()
     sys.setrecursionlimit(10000)
     win.wait_for_close()
-    sys.exit()
+root.protocol("WM_DELETE_WINDOW", on_closing)
 start_btn = tk.Button(top_frame, command=start_maze, text="Start!")
 
 start_btn.pack()
