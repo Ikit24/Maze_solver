@@ -33,14 +33,10 @@ solution_var.set("Choose solution method")
 solutions.pack()
 solutions['values'] = ('BFS', 'DFS', 'A_star')
 
-
 def on_closing():
-    """Handle window closing event"""
     if messagebox.askokcancel("Quit", "Do you want to quit?"):
-        root.destroy()  # This will close the main Tkinter window
-        sys.exit()  # This should terminate the entire application
-
-# Add this to set up the close handler
+        root.destroy()
+        sys.exit()
 
 
 def start_maze():
