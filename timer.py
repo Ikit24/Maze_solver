@@ -5,7 +5,7 @@ class Timer:
         self.root = root
         self.seconds = 0
         self.timer_running = False
-        self.timer_label = tk.Label(root, text="00:00", font=("Helvetica", 48))
+        self.timer_label = tk.Label(root, text="00:00", font=("Helvetica", 40))
         self.timer_label.pack(pady=20)
         self.update_timer()
         

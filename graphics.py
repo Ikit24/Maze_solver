@@ -7,8 +7,7 @@ class Window:
         self.__root.title("Maze Solver")
         self.__window_running = False
         if x_position is not None and y_position is not None:
-            self.__root.geometry(f"{width}x{height}+{x_position}+{y_position}")
-        
+            self.__root.geometry(f"{width}x{height}+{x_position}+{y_position}")        
         self.__canvas = Canvas(self.__root, bg="white", height=height, width=width)
         self.__canvas.pack(fill=BOTH, expand=1)
         self.__window_running = False

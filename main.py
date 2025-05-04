@@ -3,7 +3,7 @@ from maze import Maze
 from timer import Timer
 import sys
 import tkinter as tk
-from tkinter import Frame, messagebox, Label, ttk
+from tkinter import Frame, messagebox, ttk
 
 root = tk.Tk()
 root.title("Maze Solver")
