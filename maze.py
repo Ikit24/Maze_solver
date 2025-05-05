@@ -9,47 +9,62 @@ class Maze:
         self,
         x1,
         y1,
+        z1,
         num_rows,
         num_cols,
+        _num_levels,
         cell_size_x,
         cell_size_y,
+        cell_size_z,
         win=None,
         seed=None
     ):
         self._cells = []
         self.x1 = x1
         self.y1 = y1
+        self.z1 = z1
         self._num_rows = num_rows
         self._num_cols = num_cols
+        self._num_levels = _num_levels
         self.cell_size_x = cell_size_x
         self.cell_size_y = cell_size_y
+        self.cell_size_z = cell_size_z
         self._win = win
         self.maze_solve = False
 
         self._create_cells()
         self._break_entrance_and_exit()
-        self._break_walls_r(0, 0)
+        self._break_walls_r(0, 0, 0)
         self._reset_cells_visited()
 
-    def _create_cells(self):        
+    def _create_cells(self):  
+        self._cells = []
         for i in range(self._num_cols):
             columns = []
             for j in range(self._num_rows):
-                cell = Cell(self._win)
-                columns.append(cell)
+                rows = []
+                for k in range(self._num_levels):
+                    cell = Cell(self._win)
+                    cell.k = k
+                    rows.append(cell)
+                columns.append(rows)
             self._cells.append(columns)
+
         for i in range(self._num_cols):
             for j in range(self._num_rows):
-                self._draw_cell(i, j)
+                self._draw_cell(i, j, 0)
 
-    def _draw_cell(self, i , j):
+    def _draw_cell(self, i , j, k):
         if self._win is None:
             return               
         x1 = self.x1 + (i * self.cell_size_x)
         y1 = self.y1 + (j * self.cell_size_y)
+        z1 = self.z1 + (k * self.cell_size_z)
+
         x2 = x1 + self.cell_size_x
         y2 = y1 + self.cell_size_y
-        self._cells[i][j].draw(x1, y1, x2, y2)
+        z2 = z1 + self.cell_size_z
+        self._cells[i][j][k].draw(x1, y1, x2, y2, z1, z2)
         self._animate()
 
     def _animate(self):
@@ -64,8 +79,8 @@ class Maze:
         self._cells[self._num_cols - 1][self._num_rows - 1].has_bottom_wall = False
         self._draw_cell(self._num_cols - 1, self._num_rows - 1)
 
-    def _break_walls_r(self, i, j):
-        self._cells[i][j].visited = True        
+    def _break_walls_r(self, i, j, k=0):
+        self._cells[i][j][k].visited = True        
         while True:
             next_index_lst = []
 
@@ -114,9 +129,10 @@ class Maze:
             self._break_walls_r(next_index[0], next_index[1])        
 
     def _reset_cells_visited(self):
-        for i in range(self._num_cols):
-            for j in range(self._num_rows):
-                self._cells[i][j].visited = False
+        for z in range(self._num_levels):
+            for i in range(self._num_cols):
+                for j in range(self._num_rows):
+                    self._cells[z][i][j].visited = False
     
     def _solve_r(self, i, j):
         self._animate()
