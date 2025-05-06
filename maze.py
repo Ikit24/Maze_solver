@@ -86,94 +86,128 @@ class Maze:
 
             # determine which cell(s) to visit next
             # left
-            if i > 0 and not self._cells[i-1][j].visited:
-                next_index_lst.append((i - 1, j))
+            if i > 0 and not self._cells[i - 1][j][k].visited:
+                next_index_lst.append((i - 1, j, k))
             # right
-            if i < self._num_cols - 1 and not self._cells[i + 1][j].visited:
-                next_index_lst.append((i + 1, j))
+            if i < self._num_cols - 1 and not self._cells[i + 1][j][k].visited:
+                next_index_lst.append((i + 1, j, k))
             # up
-            if j > 0 and not self._cells[i][j - 1].visited:
-                next_index_lst.append((i, j - 1))
+            if j > 0 and not self._cells[i][j - 1][k].visited:
+                next_index_lst.append((i, j - 1,k ))
             # down
-            if j < self._num_rows - 1 and not self._cells[i][j + 1].visited:
-                next_index_lst.append((i, j + 1))
+            if j < self._num_rows - 1 and not self._cells[i][j + 1][k].visited:
+                next_index_lst.append((i, j + 1, k))
+            # level up
+            if k > 0 and not self._cells[i][j][k-1].visited:
+                next_index_lst.append((i, j, k - 1))
+            # level down
+            if k < self._num_levels - 1 and not self._cells[i][j][k + 1].visited:
+                next_index_lst.append((i, j, k + 1))
             
             # if there's nowhere to go from here
             # break out
             if len(next_index_lst) == 0:
-                self._draw_cell(i, j)
+                self._draw_cell(i, j, k)
                 return
             # randomly choose the next direction to go
             direction_index = random.randrange(len(next_index_lst))
             next_index = next_index_lst[direction_index]
 
+            if len(next_index) == 3:
+                next_i, next_j, next_k = next_index
+            else:
+                next_i, next_j = next_index
+                next_k = k
+
             # knock out walls between this cell and the next cell(s)
             # right
-            if next_index[0] == i + 1:
-                self._cells[i][j].has_right_wall = False
-                self._cells[i + 1][j].has_left_wall = False
+            if next_i == i + 1:
+                self._cells[i][j][k].has_right_wall = False
+                self._cells[i + 1][j][k].has_left_wall = False
             # left
-            if next_index[0] == i - 1:
-                self._cells[i][j].has_left_wall = False
-                self._cells[i - 1][j].has_right_wall = False
+            if next_i == i - 1:
+                self._cells[i][j][k].has_left_wall = False
+                self._cells[i - 1][j][k].has_right_wall = False
             # down
-            if next_index[1] == j + 1:
-                self._cells[i][j].has_bottom_wall = False
-                self._cells[i][j + 1].has_top_wall = False
+            if next_j == j + 1:
+                self._cells[i][j][k].has_bottom_wall = False
+                self._cells[i][j + 1][k].has_top_wall = False
             # up
-            if next_index[1] == j - 1:
-                self._cells[i][j].has_top_wall = False
-                self._cells[i][j - 1].has_bottom_wall = False
+            if next_j == j - 1:
+                self._cells[i][j][k].has_top_wall = False
+                self._cells[i][j - 1][k].has_bottom_wall = False
+            # level down
+            if next_k == k + 1:
+                self._cells[i][j][k].has_ceiling_wall = False
+                self._cells[i][j][k + 1].has_floor_wall = False
+            # level up
+            if next_k == k - 1:
+                self._cells[i][j][k].has_floor_wall = False
+                self._cells[i][j][k - 1].has_ceiling_wall = False
 
             # recursively visit the next cell
-            self._break_walls_r(next_index[0], next_index[1])        
+            self._break_walls_r(next_i, next_j, next_k)        
 
     def _reset_cells_visited(self):
-        for z in range(self._num_levels):
-            for i in range(self._num_cols):
-                for j in range(self._num_rows):
-                    self._cells[z][i][j].visited = False
+        for i in range(self._num_cols):
+            for j in range(self._num_rows):
+                for k in range(self._num_levels):
+                    self._cells[i][j][k].visited = False
     
-    def _solve_r(self, i, j):
+    def _solve_r(self, i, j, k):
         self._animate()
-        self._cells[i][j].visited = True
+        self._cells[i][j][k].visited = True
         
-        if i == self._num_rows - 1 and j == self._num_cols - 1:
+        if i == self._num_rows - 1 and j == self._num_cols - 1 and k == self._num_levels - 1:
             return True
         # Left
-        if i > 0 and not self._cells[i-1][j].visited and not self._cells[i][j].has_left_wall:
-            self._cells[i][j].draw_move(self._cells[i-1][j])
-            if self._solve_r(i - 1, j):
+        if i > 0 and not self._cells[i - 1][j][k].visited and not self._cells[i][j][k].has_left_wall:
+            self._cells[i][j][k].draw_move(self._cells[i - 1][j][k])
+            if self._solve_r(i - 1, j, k):
                 return True
             else:
-                self._cells[i][j].draw_move(self._cells[i-1][j], True)
+                self._cells[i][j][k].draw_move(self._cells[i - 1][j][k], True)
         # Right    
-        if i < self._num_cols - 1 and not self._cells[i+1][j].visited and not self._cells[i][j].has_right_wall:
-            self._cells[i][j].draw_move(self._cells[i+1][j])
-            if self._solve_r(i + 1, j):
+        if i < self._num_cols - 1 and not self._cells[i + 1][j][k].visited and not self._cells[i][j][k].has_right_wall:
+            self._cells[i][j][k].draw_move(self._cells[i + 1][j][k])
+            if self._solve_r(i + 1, j, k):
                 return True
             else:
-                self._cells[i][j].draw_move(self._cells[i+1][j], True)
+                self._cells[i][j][k].draw_move(self._cells[i + 1][j][k], True)
         # Up
-        if j > 0 and not self._cells[i][j-1].visited and not self._cells[i][j].has_top_wall:
-            self._cells[i][j].draw_move(self._cells[i][j-1])
-            if self._solve_r(i, j - 1):
+        if j > 0 and not self._cells[i][j - 1][k].visited and not self._cells[i][j][k].has_top_wall:
+            self._cells[i][j][k].draw_move(self._cells[i][j - 1][k])
+            if self._solve_r(i, j - 1, k):
                 return True
             else:
-                self._cells[i][j].draw_move(self._cells[i][j-1], True)
+                self._cells[i][j][k].draw_move(self._cells[i][j - 1][k], True)
         # Down
-        if j < self._num_rows - 1 and not self._cells[i][j+1].visited and not self._cells[i][j].has_bottom_wall:
-            self._cells[i][j].draw_move(self._cells[i][j+1])
-            if self._solve_r(i, j + 1):
+        if j < self._num_rows - 1 and not self._cells[i][j + 1][k].visited and not self._cells[i][j][k].has_bottom_wall:
+            self._cells[i][j][k].draw_move(self._cells[i][j + 1][k])
+            if self._solve_r(i, j + 1, k):
                 return True
             else:
-                self._cells[i][j].draw_move(self._cells[i][j+1], True)
+                self._cells[i][j][k].draw_move(self._cells[i][j + 1][k], True)
+        # Level up
+        if k > 0 and not self._cells[i][j][k - 1].visited and not self._cells[i][j][k].has_floor_wall:
+            self._cells[i][j][k].draw_move(self._cells[i][j][k - 1])
+            if self._solve_r(i, j, k - 1):
+                return True
+            else:
+                self._cells[i][j][k].draw_move(self._cells[i][j][k - 1], True)
+        # Level down
+        if k < self._num_levels - 1 and not self._cells[i][j][k + 1].visited and not self._cells[i][j][k].has_ceiling_wall:
+            self._cells[i][j][k].draw_move(self._cells[i][j][k + 1])
+            if self._solve_r(i, j, k + 1):
+                return True
+            else:
+                self._cells[i][j][k].draw_move(self._cells[i][j][k + 1], True)
         
         return False
         
     def solve(self):
         self._reset_cells_visited()
-        result = self._solve_A_star(0, 0)
+        result = self._solve_A_star(0, 0, 0)
         self.maze_solve = result
         return result
     
