@@ -47,12 +47,25 @@ class Maze:
                     cell = Cell(self._win)
                     cell.k = k
                     rows.append(cell)
+                    
+                    # Set cell coordinates for 3D drawing
+                    x1 = self.x1 + i * self.cell_size_x
+                    y1 = self.y1 + j * self.cell_size_y
+                    z1 = self.z1 + k * self.cell_size_z
+                    x2 = x1 + self.cell_size_x
+                    y2 = y1 + self.cell_size_y
+                    z2 = z1 + self.cell_size_z
+                    
+                    cell.set_coordinates(x1, y1, z1, x2, y2, z2)
+                    
                 columns.append(rows)
             self._cells.append(columns)
 
+        # Draw all cells at their initial position
         for i in range(self._num_cols):
             for j in range(self._num_rows):
-                self._draw_cell(i, j, 0)
+                for k in range(self._num_levels):
+                    self._draw_cell(i, j, k)
 
     def _draw_cell(self, i , j, k):
         if self._win is None:
@@ -98,11 +111,11 @@ class Maze:
             if j < self._num_rows - 1 and not self._cells[i][j + 1][k].visited:
                 next_index_lst.append((i, j + 1, k))
             # level up
+            if k < self._num_levels - 1 and not self._cells[i][j][k+1].visited:
+                next_index_lst.append((i, j, k + 1))
+            # level down
             if k > 0 and not self._cells[i][j][k-1].visited:
                 next_index_lst.append((i, j, k - 1))
-            # level down
-            if k < self._num_levels - 1 and not self._cells[i][j][k + 1].visited:
-                next_index_lst.append((i, j, k + 1))
             
             # if there's nowhere to go from here
             # break out

@@ -23,7 +23,19 @@ class Window:
             self.redraw()
 
     def draw_line(self, line, fill_color="black"):
-        self.__canvas.create_line(line.p1.x, line.p1.y, line.p2.x, line.p2.y, fill=fill_color, width=line.width)
+        x1, y1 = self._project_3d_to_2d(line.p1.x, line.p1.y, line.p1.z)
+        x2, y2 = self._project_3d_to_2d(line.p2.x, line.p2.y, line.p2.z)
+        self.__canvas.create_line(x1, y1, x2, y2, fill=fill_color, width=line.width)
+
+    def _project_3d_to_2d(self, x, y, z):
+        scale = 30
+        iso_x = scale * (x - z) * 0.866
+        iso_y = scale * (x + z) * 0.5 - y * scale
+
+        center_x = self.__canvas.winfo_width() / 2
+        center_y = self.__canvas.winfo_height() / 2
+
+        return center_x + iso_x, center_y + iso_y
 
     def close(self):
         self.__window_running = False
@@ -36,18 +48,19 @@ class Window:
         self.close()
 
 class Point:
-    def __init__(self, x, y):
+    def __init__(self, x, y, z=0):
         self.x = x
         self.y = y
+        self.z = z
 
 class Line:
     def __init__(self, p1, p2, width=1):
         self.p1 = p1
         self.p2 = p2
-        self.width = width 
+        self.width = width
 
     def draw(self, window, fill_color="black"):
         window.draw_line(self, fill_color)
 
-    def set_Width(self, width):
+    def set_width(self, width):
         self.width = width
