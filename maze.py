@@ -16,9 +16,15 @@ class Maze:
         cell_size_x,
         cell_size_y,
         cell_size_z,
+        depth=1,
         win=None,
-        seed=None
+        seed=None,
+        view_type="3D",
+        perspective=30
     ):
+        self.view_type = view_type
+        self.perspective = perspective
+        
         self._cells = []
         self.x1 = x1
         self.y1 = y1
@@ -31,6 +37,9 @@ class Maze:
         self.cell_size_z = cell_size_z
         self._win = win
         self.maze_solve = False
+
+        if seed is not None:
+            random.seed(seed)
 
         self._create_cells()
         self._break_entrance_and_exit()
@@ -67,9 +76,10 @@ class Maze:
                 for k in range(self._num_levels):
                     self._draw_cell(i, j, k)
 
-    def _draw_cell(self, i , j, k):
+    def _draw_cell(self, i, j, k):
         if self._win is None:
             return               
+        
         x1 = self.x1 + (i * self.cell_size_x)
         y1 = self.y1 + (j * self.cell_size_y)
         z1 = self.z1 + (k * self.cell_size_z)
@@ -77,7 +87,14 @@ class Maze:
         x2 = x1 + self.cell_size_x
         y2 = y1 + self.cell_size_y
         z2 = z1 + self.cell_size_z
-        self._cells[i][j][k].draw(x1, y1, x2, y2, z1, z2)
+        
+        # Pass the view_type and perspective to the cell's draw method
+        self._cells[i][j][k].draw(
+            x1, y1, x2, y2, z1, z2, 
+            view_type=self.view_type, 
+            perspective=self.perspective
+        )
+        
         self._animate()
 
     def _animate(self):

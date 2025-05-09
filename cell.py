@@ -2,7 +2,7 @@ from graphics import Line, Point
 import time
 
 class Cell:
-    def __init__(self, win=None):
+    def __init__(self, win=None, view_type="3D", perspective=30):
         self.has_left_wall = True
         self.has_right_wall = True
         self.has_top_wall = True
@@ -17,6 +17,8 @@ class Cell:
         self._z1 = None
         self._z2 = None
         self._win = win
+        self.view_type = view_type
+        self.perspective = perspective
 
     def draw(self, x1, y1, x2, y2, z1, z2):
         if self._win is None:
@@ -27,6 +29,11 @@ class Cell:
         self._y2 = y2
         self._z1 = z1
         self._z2 = z2
+
+        if self.view_type == "2D":
+            self._draw_2d(x1, y1, x2, y2)
+        else:
+            self._draw_3d(x1, y1, x2, y2, z1, z2)
 
         # Bottom face
         bottom_nw = Point(x1, y1, z1)
@@ -125,8 +132,33 @@ class Cell:
             line = Line(bottom_sw, top_sw)
             self._win.draw_line(line, "white")
 
+        # 2. Floor pattern (replace the placeholder)
         if self.has_floor_wall:
-            pass
+            # X pattern for the floor
+            line = Line(bottom_nw, bottom_se)
+            self._win.draw_line(line)
+            line = Line(bottom_ne, bottom_sw)
+            self._win.draw_line(line)
+        else:
+            # X pattern for the floor in white (indicating no wall)
+            line = Line(bottom_nw, bottom_se)
+            self._win.draw_line(line, "white")
+            line = Line(bottom_ne, bottom_sw)
+            self._win.draw_line(line, "white")
+
+        # 3. Ceiling pattern (optional)
+        if self.has_ceiling_wall:
+            # X pattern for the ceiling
+            line = Line(top_nw, top_se)
+            self._win.draw_line(line)
+            line = Line(top_ne, top_sw)
+            self._win.draw_line(line)
+        else:
+            # X pattern for the ceiling in white (indicating no wall)
+            line = Line(top_nw, top_se)
+            self._win.draw_line(line, "white")
+            line = Line(top_ne, top_sw)
+            self._win.draw_line(line, "white")
 
     def draw_move(self, to_cell, undo=False):
         # Calculate center of current cell
