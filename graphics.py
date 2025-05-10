@@ -28,7 +28,7 @@ class Window:
         self.__canvas.create_line(x1, y1, x2, y2, fill=fill_color, width=line.width)
 
     def _project_3d_to_2d(self, x, y, z):
-        scale = 30
+        scale = 50
         iso_x = scale * (x - z) * 0.866
         iso_y = scale * (x + z) * 0.5 - y * scale
 

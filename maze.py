@@ -53,7 +53,7 @@ class Maze:
             for j in range(self._num_rows):
                 rows = []
                 for k in range(self._num_levels):
-                    cell = Cell(self._win)
+                    cell = Cell(self._win, view_type=self.view_type, perspective=self.perspective)
                     cell.k = k
                     rows.append(cell)
                     
@@ -87,13 +87,13 @@ class Maze:
         x2 = x1 + self.cell_size_x
         y2 = y1 + self.cell_size_y
         z2 = z1 + self.cell_size_z
-        
-        # Pass the view_type and perspective to the cell's draw method
-        self._cells[i][j][k].draw(
-            x1, y1, x2, y2, z1, z2, 
-            view_type=self.view_type, 
-            perspective=self.perspective
-        )
+
+        try:
+            self._cells[i][j][k].draw(x1, y1, x2, y2, z1, z2)
+        except TypeError as e:
+            print(f"TypeError in _draw_cell: {e}")
+            # Try a simpler call if needed
+            self._cells[i][j][k].draw(x1, y1, x2, y2)
         
         self._animate()
 

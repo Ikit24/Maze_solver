@@ -89,7 +89,7 @@ def start_maze():
     maze = Maze(
         x1=margin, 
         y1=margin, 
-        z1=0,            # Z position offset
+        z1=0,
         num_rows=rows, 
         num_cols=cols, 
         _num_levels=depth,
