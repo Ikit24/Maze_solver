@@ -26,11 +26,10 @@ depth_label.pack()
 depth_entry = tk.Entry(top_frame)
 depth_entry.pack()
 
-# Add a slider for 3D perspective adjustment
 perspective_label = tk.Label(top_frame, text="3D Perspective:")
 perspective_label.pack()
 perspective_slider = tk.Scale(top_frame, from_=0, to=100, orient=tk.HORIZONTAL)
-perspective_slider.set(30)  # Default value
+perspective_slider.set(30)
 perspective_slider.pack()
 
 view_var = tk.StringVar(value="3D")
@@ -67,12 +66,12 @@ def start_maze():
     if rows is None or cols is None or depth is None:
         return
     
-    margin = 50
+    margin = 80
     screen_x = 1200
     screen_y = 1000
-    cell_size_x = (screen_x - 2 * margin) / cols
-    cell_size_y = (screen_y - 2 * margin) / rows
-    cell_size_z = min(cell_size_x, cell_size_y) / 2
+    cell_size_x = (screen_x - 2 * margin) / (cols * 1.2)
+    cell_size_y = (screen_y - 2 * margin) / (rows * 1.2)
+    cell_size_z = min(cell_size_x, cell_size_y) * 0.6  # Reduced z-height
     
     main_x = root.winfo_x()
     main_y = root.winfo_y()
@@ -85,21 +84,30 @@ def start_maze():
     # Get view type if the radio buttons exist
     view_type = view_var.get() if 'view_var' in globals() else "3D"
     
+    print(f"Creating maze with dimensions: {rows}x{cols}x{depth}")
+    print(f"Using view mode: {view_type}")
+    print(f"Perspective value: {perspective}")
+        
     win = Window(screen_x, screen_y, x_position=maze_x, y_position=maze_y)
+    win.set_view_mode(view_type)
+    win.set_perspective(perspective)
+        
+    print(f"Cell sizes: x={cell_size_x}, y={cell_size_y}, z={cell_size_z}")
+    
     maze = Maze(
-        x1=margin, 
-        y1=margin, 
-        z1=0,
-        num_rows=rows, 
-        num_cols=cols, 
-        _num_levels=depth,
-        cell_size_x=cell_size_x, 
-        cell_size_y=cell_size_y, 
-        cell_size_z=cell_size_z, 
-        win=win,
-        view_type=view_type,      # Pass view_type parameter
-        perspective=perspective
-    )
+            x1=margin, 
+            y1=margin, 
+            z1=0,
+            num_rows=rows, 
+            num_cols=cols, 
+            _num_levels=depth,
+            cell_size_x=cell_size_x, 
+            cell_size_y=cell_size_y, 
+            cell_size_z=cell_size_z, 
+            win=win,
+            view_type=view_type,
+            perspective=perspective
+        )
     selected = solution_var.get()
 
     timer.start()    
