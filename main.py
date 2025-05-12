@@ -71,17 +71,15 @@ def start_maze():
     screen_y = 1000
     cell_size_x = (screen_x - 2 * margin) / (cols * 1.2)
     cell_size_y = (screen_y - 2 * margin) / (rows * 1.2)
-    cell_size_z = min(cell_size_x, cell_size_y) * 0.6  # Reduced z-height
+    cell_size_z = min(cell_size_x, cell_size_y) * 0.6
     
     main_x = root.winfo_x()
     main_y = root.winfo_y()
     maze_x = main_x + root.winfo_width() + 10
     maze_y = main_y
     
-    # Get perspective value if the slider exists
     perspective = perspective_slider.get() if 'perspective_slider' in globals() else 30
     
-    # Get view type if the radio buttons exist
     view_type = view_var.get() if 'view_var' in globals() else "3D"
     
     print(f"Creating maze with dimensions: {rows}x{cols}x{depth}")
@@ -112,11 +110,11 @@ def start_maze():
 
     timer.start()    
     if selected == "BFS":
-        is_solvable = maze._solve_bfs(0, 0, 0)  # Added z=0 parameter for starting position
+        is_solvable = maze._solve_bfs(0, 0, 0)
     elif selected == "DFS":
-        is_solvable = maze._solve_r(0, 0, 0)    # Added z=0 parameter for starting position
+        is_solvable = maze._solve_r(0, 0, 0)
     elif selected == "A_star":
-        is_solvable = maze._solve_A_star(0, 0, 0)  # Added z=0 parameter for starting position
+        is_solvable = maze._solve_A_star(0, 0, 0)
     if not is_solvable:
         print("maze can not be solved!")
     else:

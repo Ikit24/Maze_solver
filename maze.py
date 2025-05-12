@@ -57,7 +57,6 @@ class Maze:
                     cell.k = k
                     rows.append(cell)
                     
-                    # Set cell coordinates for 3D drawing
                     x1 = self.x1 + i * self.cell_size_x
                     y1 = self.y1 + j * self.cell_size_y
                     z1 = self.z1 + k * self.cell_size_z
@@ -70,7 +69,6 @@ class Maze:
                 columns.append(rows)
             self._cells.append(columns)
 
-        # Draw all cells at their initial position
         for i in range(self._num_cols):
             for j in range(self._num_rows):
                 for k in range(self._num_levels):
@@ -79,7 +77,6 @@ class Maze:
     def _draw_cell(self, i, j, k):
         if self._win is None:
             return
-        # Remove the parameters passed to draw()
         self._cells[i][j][k].draw()
         self._animate()
 
@@ -90,56 +87,40 @@ class Maze:
         time.sleep(0.03)
         
     def _break_entrance_and_exit(self):
-        # Entrance (break front wall)
         self._cells[0][0][0].has_left_wall = False
         self._draw_cell(0, 0, 0)
 
-        # Exit (break rightmost wall in top level)
         exit_i = self._num_cols - 1
         exit_j = self._num_rows - 1
         exit_k = self._num_levels - 1
         self._cells[exit_i][exit_j][exit_k].has_right_wall = False
         self._draw_cell(exit_i, exit_j, exit_k)
 
-    # Update _break_walls_r method in maze.py
     def _break_walls_r(self, i, j, k=0):
-        """
-        Recursive function to break walls between cells to create the maze.
-        Uses a depth-first approach.
-        """
         self._cells[i][j][k].visited = True
         
-        # Create a list of unvisited neighbors
         neighbors = []
         
-        # Check left neighbor
         if i > 0 and not self._cells[i - 1][j][k].visited:
             neighbors.append(("left", i - 1, j, k))
         
-        # Check right neighbor
         if i < self._num_cols - 1 and not self._cells[i + 1][j][k].visited:
             neighbors.append(("right", i + 1, j, k))
         
-        # Check top neighbor
         if j > 0 and not self._cells[i][j - 1][k].visited:
             neighbors.append(("top", i, j - 1, k))
         
-        # Check bottom neighbor
         if j < self._num_rows - 1 and not self._cells[i][j + 1][k].visited:
             neighbors.append(("bottom", i, j + 1, k))
         
-        # Check up neighbor (increase in z)
         if k < self._num_levels - 1 and not self._cells[i][j][k + 1].visited:
             neighbors.append(("up", i, j, k + 1))
         
-        # Check down neighbor (decrease in z)
         if k > 0 and not self._cells[i][j][k - 1].visited:
             neighbors.append(("down", i, j, k - 1))
         
-        # Randomize the neighbors
         random.shuffle(neighbors)
         
-        # Visit each neighbor
         for direction, next_i, next_j, next_k in neighbors:
             if direction == "left":
                 self._cells[i][j][k].has_left_wall = False
@@ -160,13 +141,10 @@ class Maze:
                 self._cells[i][j][k].has_floor_wall = False
                 self._cells[next_i][next_j][next_k].has_ceiling_wall = False
             
-            # Draw the current cell to show the broken wall
             self._draw_cell(i, j, k)
             
-            # Recursively visit the next cell
             self._break_walls_r(next_i, next_j, next_k)
         
-        # Draw the current cell again when backtracking
         self._draw_cell(i, j, k)        
 
     def _reset_cells_visited(self):
@@ -175,7 +153,6 @@ class Maze:
                 for k in range(self._num_levels):
                     self._cells[i][j][k].visited = False
     
-    # Update the _solve_r method in maze.py for consistent navigation
     def _solve_r(self, i, j, k):
         """
         Recursive depth-first solver for the maze.
@@ -183,11 +160,9 @@ class Maze:
         self._animate()
         self._cells[i][j][k].visited = True
         
-        # Check if we've reached the destination
         if i == self._num_cols - 1 and j == self._num_rows - 1 and k == self._num_levels - 1:
             return True
         
-        # Define possible moves with clear direction labels
         moves = []
         
         # Check left
@@ -214,19 +189,14 @@ class Maze:
         if k > 0 and not self._cells[i][j][k - 1].visited and not self._cells[i][j][k].has_floor_wall:
             moves.append(("level_down", i, j, k - 1))
         
-        # Try each possible move
         for direction, next_i, next_j, next_k in moves:
-            # Draw the move
             self._cells[i][j][k].draw_move(self._cells[next_i][next_j][next_k])
             
-            # Recursively try this path
             if self._solve_r(next_i, next_j, next_k):
                 return True
             
-            # If this path doesn't lead to the exit, backtrack
             self._cells[i][j][k].draw_move(self._cells[next_i][next_j][next_k], True)
         
-        # No path found from this cell
         return False
         
     def solve(self):
@@ -277,7 +247,6 @@ class Maze:
                 self._cells[current_i][current_j][current_k].draw_move(self._cells[current_i][current_j][current_k + 1])
                 self._cells[current_i][current_j][current_k + 1].visited = True
                 queue.append((current_i, current_j, current_k + 1))  
-        # No path found
         return False
     
     def _calculate_heuristic(self, current, goal):
@@ -294,19 +263,15 @@ class Maze:
         if start_i == goal_i and start_j == goal_j and start_k == goal_k:
             return True
         
-        # Tracks teps from start
         g_scores = {}
         g_scores[(start_i, start_j, start_k)] = 0
 
-        # Calculate f scores (g + h)
         f_scores = {}
         f_scores[(start_i, start_j, start_k)] = self._calculate_heuristic((start_i, start_j, start_k), (goal_i, goal_j, goal_k))
 
-        # Priority queue
         open_set = []
         heapq.heappush(open_set, (f_scores[(start_i, start_j, start_k)], (start_i, start_j, start_k)))
 
-        # Track visited cells for reconstruction
         visited = set()
         parents = {}
 
@@ -323,19 +288,14 @@ class Maze:
             if (current_i > 0 and not self._cells[current_i][current_j][current_k].has_left_wall):
                 neighbor = (current_i - 1, current_j, current_k)
                 
-                # Calculate tentative g_score (one step further)
                 tentative_g_score = g_scores[(current_i, current_j, current_k)] + 1
                 
-                # If we found a better path to this neighbor
                 if neighbor not in g_scores or tentative_g_score < g_scores[neighbor]:
-                    # Update parent for path reconstruction
                     parents[neighbor] = (current_i, current_j, current_k)
                     
-                    # Update scores
                     g_scores[neighbor] = tentative_g_score
                     f_scores[neighbor] = g_scores[neighbor] + self._calculate_heuristic(neighbor, (goal_i, goal_j, goal_k))
                     
-                    # Add to queue if not already visited
                     if neighbor not in visited:
                         heapq.heappush(open_set, (f_scores[neighbor], neighbor))
                         self._cells[current_i][current_j][current_k].draw_move(self._cells[neighbor[0]][neighbor[1]][neighbor[2]])
@@ -345,19 +305,14 @@ class Maze:
             if (current_i < self._num_cols - 1 and not self._cells[current_i][current_j][current_k].has_right_wall):
                 neighbor = (current_i + 1, current_j, current_k)
                 
-                # Calculate tentative g_score (one step further)
                 tentative_g_score = g_scores[(current_i, current_j, current_k)] + 1
                 
-                # If we found a better path to this neighbor
                 if neighbor not in g_scores or tentative_g_score < g_scores[neighbor]:
-                    # Update parent for path reconstruction
                     parents[neighbor] = (current_i, current_j, current_k)
                     
-                    # Update scores
                     g_scores[neighbor] = tentative_g_score
                     f_scores[neighbor] = g_scores[neighbor] + self._calculate_heuristic(neighbor, (goal_i, goal_j, goal_k))
                     
-                    # Add to queue if not already visited
                     if neighbor not in visited:
                         heapq.heappush(open_set, (f_scores[neighbor], neighbor))
                         self._cells[current_i][current_j][current_k].draw_move(self._cells[neighbor[0]][neighbor[1]][neighbor[2]])
@@ -367,19 +322,14 @@ class Maze:
             if (current_j > 0 and not self._cells[current_i][current_j][current_k].has_top_wall):
                 neighbor = (current_i, current_j - 1, current_k)
                 
-                # Calculate tentative g_score (one step further)
                 tentative_g_score = g_scores[(current_i, current_j, current_k)] + 1
                 
-                # If we found a better path to this neighbor
                 if neighbor not in g_scores or tentative_g_score < g_scores[neighbor]:
-                    # Update parent for path reconstruction
                     parents[neighbor] = (current_i, current_j, current_k)
                     
-                    # Update scores
                     g_scores[neighbor] = tentative_g_score
                     f_scores[neighbor] = g_scores[neighbor] + self._calculate_heuristic(neighbor, (goal_i, goal_j, goal_k))
                     
-                    # Add to queue if not already visited
                     if neighbor not in visited:
                         heapq.heappush(open_set, (f_scores[neighbor], neighbor))
                         self._cells[current_i][current_j][current_k].draw_move(self._cells[neighbor[0]][neighbor[1]][neighbor[2]])
@@ -388,20 +338,14 @@ class Maze:
             # Down
             if (current_j < self._num_rows - 1 and not self._cells[current_i][current_j][current_k].has_bottom_wall):
                 neighbor = (current_i, current_j + 1, current_k)
-                
-                # Calculate tentative g_score (one step further)
                 tentative_g_score = g_scores[(current_i, current_j, current_k)] + 1
                 
-                # If we found a better path to this neighbor
                 if neighbor not in g_scores or tentative_g_score < g_scores[neighbor]:
-                    # Update parent for path reconstruction
                     parents[neighbor] = (current_i, current_j, current_k)
                     
-                    # Update scores
                     g_scores[neighbor] = tentative_g_score
                     f_scores[neighbor] = g_scores[neighbor] + self._calculate_heuristic(neighbor, (goal_i, goal_j, goal_k))
                     
-                    # Add to queue if not already visited
                     if neighbor not in visited:
                         heapq.heappush(open_set, (f_scores[neighbor], neighbor))
                         self._cells[current_i][current_j][current_k].draw_move(self._cells[neighbor[0]][neighbor[1]][neighbor[2]])
@@ -411,19 +355,14 @@ class Maze:
             if (current_k > 0 and not self._cells[current_i][current_j][current_k].has_floor_wall):
                 neighbor = (current_i, current_j, current_k - 1)
                 
-                # Calculate tentative g_score (one step further)
                 tentative_g_score = g_scores[(current_i, current_j, current_k)] + 1
                 
-                # If we found a better path to this neighbor
                 if neighbor not in g_scores or tentative_g_score < g_scores[neighbor]:
-                    # Update parent for path reconstruction
                     parents[neighbor] = (current_i, current_j, current_k)
                     
-                    # Update scores
                     g_scores[neighbor] = tentative_g_score
                     f_scores[neighbor] = g_scores[neighbor] + self._calculate_heuristic(neighbor, (goal_i, goal_j, goal_k))
                     
-                    # Add to queue if not already visited
                     if neighbor not in visited:
                         heapq.heappush(open_set, (f_scores[neighbor], neighbor))
                         self._cells[current_i][current_j][current_k].draw_move(self._cells[neighbor[0]][neighbor[1]][neighbor[2]])
@@ -433,19 +372,14 @@ class Maze:
             if (current_k < self._num_levels - 1 and not self._cells[current_i][current_j][current_k].has_ceiling_wall):
                 neighbor = (current_i, current_j, current_k + 1)
                 
-                # Calculate tentative g_score (one step further)
                 tentative_g_score = g_scores[(current_i, current_j, current_k)] + 1
                 
-                # If we found a better path to this neighbor
                 if neighbor not in g_scores or tentative_g_score < g_scores[neighbor]:
-                    # Update parent for path reconstruction
                     parents[neighbor] = (current_i, current_j, current_k)
                     
-                    # Update scores
                     g_scores[neighbor] = tentative_g_score
                     f_scores[neighbor] = g_scores[neighbor] + self._calculate_heuristic(neighbor, (goal_i, goal_j, goal_k))
                     
-                    # Add to queue if not already visited
                     if neighbor not in visited:
                         heapq.heappush(open_set, (f_scores[neighbor], neighbor))
                         self._cells[current_i][current_j][current_k].draw_move(self._cells[neighbor[0]][neighbor[1]][neighbor[2]])
