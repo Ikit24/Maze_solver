@@ -32,19 +32,40 @@ class Cell:
         if self._win is None:
             return
 
-        if self.view_type == "3D":
-            self._draw_wall(Point(self._x1, self._y2, self._z1), Point(self._x1, self._y1, self._z1), self.has_left_wall)
-            self._draw_wall(Point(self._x1, self._y1, self._z1), Point(self._x2, self._y1, self._z1), self.has_top_wall)
-            self._draw_wall(Point(self._x2, self._y1, self._z1), Point(self._x2, self._y2, self._z1), self.has_right_wall)
-            self._draw_wall(Point(self._x2, self._y2, self._z1), Point(self._x1, self._y2, self._z1), self.has_bottom_wall)
+        # Bottom face (z1 level)
+        bottom_nw = Point(self._x1, self._y1, self._z1)
+        bottom_ne = Point(self._x2, self._y1, self._z1)
+        bottom_se = Point(self._x2, self._y2, self._z1)
+        bottom_sw = Point(self._x1, self._y2, self._z1)
 
-            self._draw_wall(Point(self._x1, self._y1, self._z1), Point(self._x1, self._y1, self._z2), self.has_ceiling_wall)
-            self._draw_wall(Point(self._x2, self._y1, self._z1), Point(self._x2, self._y1, self._z2), self.has_ceiling_wall)
-        else:
-            self._draw_wall(Point(self._x1, self._y1), Point(self._x2, self._y1), self.has_top_wall)
-            self._draw_wall(Point(self._x2, self._y1), Point(self._x2, self._y2), self.has_right_wall)
-            self._draw_wall(Point(self._x2, self._y2), Point(self._x1, self._y2), self.has_bottom_wall)
-            self._draw_wall(Point(self._x1, self._y2), Point(self._x1, self._y1), self.has_left_wall)
+        # Draw bottom walls
+        self._draw_wall(bottom_sw, bottom_nw, self.has_left_wall)
+        self._draw_wall(bottom_nw, bottom_ne, self.has_top_wall)
+        self._draw_wall(bottom_ne, bottom_se, self.has_right_wall)
+        self._draw_wall(bottom_se, bottom_sw, self.has_bottom_wall)
+
+        if self.view_type == "3D":
+            # Top face (z2 level)
+            top_nw = Point(self._x1, self._y1, self._z2)
+            top_ne = Point(self._x2, self._y1, self._z2)
+            top_se = Point(self._x2, self._y2, self._z2)
+            top_sw = Point(self._x1, self._y2, self._z2)
+
+            # Draw top walls
+            self._draw_wall(top_sw, top_nw, self.has_left_wall)
+            self._draw_wall(top_nw, top_ne, self.has_top_wall)
+            self._draw_wall(top_ne, top_se, self.has_right_wall)
+            self._draw_wall(top_se, top_sw, self.has_bottom_wall)
+
+            # Vertical pillars (connect bottom and top)
+            self._draw_wall(bottom_nw, top_nw, self.has_ceiling_wall)
+            self._draw_wall(bottom_ne, top_ne, self.has_ceiling_wall)
+            self._draw_wall(bottom_se, top_se, self.has_ceiling_wall)
+            self._draw_wall(bottom_sw, top_sw, self.has_ceiling_wall)
+
+            # Back face pillars (for depth perception)
+            self._draw_wall(top_nw, top_ne, self.has_ceiling_wall)
+            self._draw_wall(top_ne, top_se, self.has_ceiling_wall)
 
     def _draw_wall(self, p1, p2, wall_exists):
         line = Line(p1, p2)
@@ -54,29 +75,21 @@ class Cell:
             self._win.draw_line(line, "white")
 
     def draw_move(self, to_cell, undo=False):
-        if self._win is None:
-            return
-        
-        x_center = (self._x1 + self._x2) / 2
-        y_center = (self._y1 + self._y2) / 2
+        # Calculate centers with a slight offset toward the front
+        offset = 0.15  # 15% offset to avoid overlapping walls
+        x_center = (self._x1 + self._x2) / 2 + (self._x2 - self._x1) * offset
+        y_center = (self._y1 + self._y2) / 2 + (self._y2 - self._y1) * offset
         z_center = (self._z1 + self._z2) / 2
-            
-        x_center2 = (to_cell._x1 + to_cell._x2) / 2
-        y_center2 = (to_cell._y1 + to_cell._y2) / 2
+
+        x_center2 = (to_cell._x1 + to_cell._x2) / 2 + (to_cell._x2 - to_cell._x1) * offset
+        y_center2 = (to_cell._y1 + to_cell._y2) / 2 + (to_cell._y2 - to_cell._y1) * offset
         z_center2 = (to_cell._z1 + to_cell._z2) / 2
-            
-        fill_color = "green" if not undo else "red"
-        
-        line_width = 3
-        
+
+        # Draw line
+        color = "red" if undo else "green"
         line = Line(
-            Point(x_center, y_center, z_center), 
+            Point(x_center, y_center, z_center),
             Point(x_center2, y_center2, z_center2),
-            width=line_width
+            width=3
         )
-        self._win.draw_line(line, fill_color)
-        
-        if undo:
-            time.sleep(0.01)
-        else:
-            time.sleep(0.05)
+        self._win.draw_line(line, color)
