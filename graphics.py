@@ -56,18 +56,18 @@ class Window:
         draw_width = canvas_width - 2 * self.__margin
         draw_height = canvas_height - 2 * self.__margin
 
-        # Calculate dynamic scaling factors
+        # Improved scaling calculation
         x_scale = draw_width / max(self.__maze_width, 1)
-        y_scale = draw_height / max(self.__maze_height + self.__maze_depth, 1)
-        scale = min(x_scale, y_scale) * 0.85  # 15% buffer
+        y_scale = draw_height / max(self.__maze_height + (self.__maze_depth * 0.7), 1)
+        scale = min(x_scale, y_scale) * 0.75  # Reduced buffer
 
-        # Calculate isometric projection
+        # Adjusted isometric projection
         iso_x = (x - y) * 0.866 * scale
-        iso_y = (x + y) * 0.5 * scale - z * scale * 0.3
+        iso_y = (x + y) * 0.5 * scale - z * scale * 0.2  # Reduced z impact
 
-        # Center the projection
+        # Dynamic centering
         center_x = self.__margin + (draw_width / 2)
-        center_y = self.__margin + (draw_height / 2)
+        center_y = self.__margin + (draw_height / 2) - (self.__maze_depth * scale * 0.1)
 
         return center_x + iso_x, center_y + iso_y
 
@@ -84,27 +84,6 @@ class Window:
     def close(self):
         self.__window_running = False
         self.__root.destroy()
-
-class Point:
-    def __init__(self, x, y, z=0):
-        self.x = x
-        self.y = y
-        self.z = z
-        
-    def __str__(self):
-        return f"Point({self.x}, {self.y}, {self.z})"
-
-class Line:
-    def __init__(self, p1, p2, width=1):
-        self.p1 = p1
-        self.p2 = p2
-        self.width = width
-
-    def draw(self, window, fill_color="black"):
-        window.draw_line(self, fill_color)
-
-    def set_width(self, width):
-        self.width = width
 
 class Point:
     def __init__(self, x, y, z=0):

@@ -85,13 +85,13 @@ class App:
             return
 
         # Maze parameters
-        margin = 50
+        margin = 30
         screen_x = 1200
         screen_y = 1000
-        size_buffer = max(cols, rows, depth) * 0.5
+        size_buffer = max(cols, rows, depth) * 0.3
         cell_size_x = (screen_x - 2 * margin) / (cols + size_buffer)
         cell_size_y = (screen_y - 2 * margin) / (rows + size_buffer)
-        cell_size_z = min(cell_size_x, cell_size_y) * 0.4
+        cell_size_z = min(cell_size_x, cell_size_y) * 0.35
 
         win = Window(
             width=1200,

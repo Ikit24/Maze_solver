@@ -90,15 +90,19 @@ class Maze:
         time.sleep(0.01)
         
     def _break_entrance_and_exit(self):
-        # Entrance: Break front-left wall at level 0
+        # Entrance: Break front wall at bottom level
         self._cells[0][0][0].has_left_wall = False
         self._draw_cell(0, 0, 0)
 
-        # Exit: Break far-right wall at the highest level
+        # Exit: Break ceiling at top level if multi-level, else right wall
         exit_i = self._num_cols - 1
         exit_j = self._num_rows - 1
         exit_k = self._num_levels - 1
-        self._cells[exit_i][exit_j][exit_k].has_right_wall = False
+        
+        if self._num_levels > 1:
+            self._cells[exit_i][exit_j][exit_k].has_ceiling_wall = False
+        else:
+            self._cells[exit_i][exit_j][exit_k].has_right_wall = False
         self._draw_cell(exit_i, exit_j, exit_k)
 
     # Update _break_walls_r method in maze.py

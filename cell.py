@@ -75,15 +75,14 @@ class Cell:
             self._win.draw_line(line, "white")
 
     def draw_move(self, to_cell, undo=False):
-        # Calculate centers with a slight offset toward the front
-        offset = 0.15  # 15% offset to avoid overlapping walls
-        x_center = (self._x1 + self._x2) / 2 + (self._x2 - self._x1) * offset
-        y_center = (self._y1 + self._y2) / 2 + (self._y2 - self._y1) * offset
-        z_center = (self._z1 + self._z2) / 2
+        offset = 0.2
+        x_center = (self._x1 + self._x2)/2 + (self._x2 - self._x1) * offset
+        y_center = (self._y1 + self._y2)/2 + (self._y2 - self._y1) * offset
+        z_center = (self._z1 + self._z2)/2
 
-        x_center2 = (to_cell._x1 + to_cell._x2) / 2 + (to_cell._x2 - to_cell._x1) * offset
-        y_center2 = (to_cell._y1 + to_cell._y2) / 2 + (to_cell._y2 - to_cell._y1) * offset
-        z_center2 = (to_cell._z1 + to_cell._z2) / 2
+        x_center2 = (to_cell._x1 + to_cell._x2)/2 + (to_cell._x2 - to_cell._x1) * offset
+        y_center2 = (to_cell._y1 + to_cell._y2)/2 + (to_cell._y2 - to_cell._y1) * offset
+        z_center2 = (to_cell._z1 + to_cell._z2)/2
 
         # Draw line
         color = "red" if undo else "green"
@@ -93,3 +92,4 @@ class Cell:
             width=3
         )
         self._win.draw_line(line, color)
+        time.sleep(0.03 if not undo else 0.01)
