@@ -5,4 +5,4 @@ This project was done as a part of Boot.dev project, additional features added b
 The program uses tkinter widget through which the user can set the maze size,
 and choose solution method.
 
-It also tracks the time it takes to solve the maze.
+Featuring time tracker for measuring time it takes to solve a maze.
